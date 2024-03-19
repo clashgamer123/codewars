@@ -63,6 +63,9 @@ def checkIsland(pirate):
         return False
 
 island_c=[0,0,0,0,0,0]
+island_order=[]
+i=0
+deploy_p=[20,20]
 
 def ActPirate(pirate):
     n= pirate.investigate_up()[0]
@@ -78,6 +81,13 @@ def ActPirate(pirate):
     st = pirate.trackPlayers()
     sig=""
     global island_c
+    global deploy_p
+    global i
+    
+    if i==1 :
+        deploy_p=[x,y]
+    else: pass
+    
     
     if (
         ((e == "island1" and st[0] != "myCaptured")
@@ -257,8 +267,7 @@ def ActPirate(pirate):
         
     else: 
         pass   
-    
-    
+
     if pirate.getTeamSignal() != "":
         sig = pirate.getTeamSignal()
         l = sig.split(",")
@@ -268,7 +277,7 @@ def ActPirate(pirate):
         return moveTo(x, y, pirate)
 
     else:
-        return random.randint(1, 4)
+        return moveAway(deploy_p[0],deploy_p[1],pirate)
 
     pass
 
@@ -276,6 +285,10 @@ def ActPirate(pirate):
 def ActTeam(team):
     l = team.trackPlayers()
     s = team.getTeamSignal()
+    
+    global i
+    i+=1
+    print(team.getCurrentFrame())
 
     team.buildWalls(1)
     team.buildWalls(2)   
