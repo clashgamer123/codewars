@@ -1,7 +1,7 @@
 import random
 import math
 
-name = "script1"
+name = "script"
 
 
 def moveTo(x, y, Pirate):
@@ -75,14 +75,14 @@ def ActPirate(pirate):
     sw= pirate.investigate_sw()[0]
     x, y = pirate.getPosition()
     pirate.setSignal("")
-    sig = pirate.trackPlayers()
-    
+    st = pirate.trackPlayers()
+    sig=""
     global island_c
     
     if (
-        ((e == "island1" and s[0] != "myCaptured")
-        or (e == "island2" and s[1] != "myCaptured")
-        or (e == "island3" and s[2] != "myCaptured"))
+        ((e == "island1" and st[0] != "myCaptured")
+        or (e == "island2" and st[1] != "myCaptured")
+        or (e == "island3" and st[2] != "myCaptured"))
         and
         ((se=='blank'))
     ):
@@ -92,9 +92,9 @@ def ActPirate(pirate):
         island_c[int(e[-1])*2-1]=y-1
         
     elif (
-        ((e == "island1" and s[0] != "myCaptured")
-        or (e == "island2" and s[1] != "myCaptured")
-        or (e == "island3" and s[2] != "myCaptured"))
+        ((e == "island1" and st[0] != "myCaptured")
+        or (e == "island2" and st[1] != "myCaptured")
+        or (e == "island3" and st[2] != "myCaptured"))
         and
         ((ne=='blank'))
     ):
@@ -104,9 +104,9 @@ def ActPirate(pirate):
         island_c[int(e[-1])*2-1]=y+1
         
     elif (
-        ((e == "island1" and s[0] != "myCaptured")
-        or (e == "island2" and s[1] != "myCaptured")
-        or (e == "island3" and s[2] != "myCaptured"))
+        ((e == "island1" and st[0] != "myCaptured")
+        or (e == "island2" and st[1] != "myCaptured")
+        or (e == "island3" and st[2] != "myCaptured"))
     ):
         sig=e[-1]+str(x+2)+","+str(y)
         pirate.setTeamSignal(sig)
@@ -114,9 +114,9 @@ def ActPirate(pirate):
         island_c[int(e[-1])*2-1]=y
         
     elif (
-        ((se == "island1" and s[0] != "myCaptured")
-        or (se == "island2" and s[1] != "myCaptured")
-        or (se == "island3" and s[2] != "myCaptured"))
+        ((se == "island1" and st[0] != "myCaptured")
+        or (se == "island2" and st[1] != "myCaptured")
+        or (se == "island3" and st[2] != "myCaptured"))
     ):
         sig=se[-1]+str(x+2)+","+str(y+2)
         pirate.setTeamSignal(sig)
@@ -124,9 +124,9 @@ def ActPirate(pirate):
         island_c[int(se[-1])*2-1]=y+2
         
     elif (
-        ((ne == "island1" and s[0] != "myCaptured")
-        or (ne == "island2" and s[1] != "myCaptured")
-        or (ne == "island3" and s[2] != "myCaptured"))
+        ((ne == "island1" and st[0] != "myCaptured")
+        or (ne == "island2" and st[1] != "myCaptured")
+        or (ne == "island3" and st[2] != "myCaptured"))
     ):
         sig=ne[-1]+str(x+2)+","+str(y-2)
         pirate.setTeamSignal(sig)
@@ -134,9 +134,9 @@ def ActPirate(pirate):
         island_c[int(ne[-1])*2-1]=y-2
         
     elif (
-        ((w== "island1" and s[0] != "myCaptured")
-        or (w == "island2" and s[1] != "myCaptured")
-        or (w == "island3" and s[2] != "myCaptured"))
+        ((w== "island1" and st[0] != "myCaptured")
+        or (w == "island2" and st[1] != "myCaptured")
+        or (w == "island3" and st[2] != "myCaptured"))
         and
         nw=="blank"
     ):
@@ -146,9 +146,9 @@ def ActPirate(pirate):
         island_c[int(w[-1])*2-1]=y+1
         
     elif (
-        ((w== "island1" and s[0] != "myCaptured")
-        or (w == "island2" and s[1] != "myCaptured")
-        or (w == "island3" and s[2] != "myCaptured"))
+        ((w== "island1" and st[0] != "myCaptured")
+        or (w == "island2" and st[1] != "myCaptured")
+        or (w == "island3" and st[2] != "myCaptured"))
         and
         sw=="blank"
     ):
@@ -158,9 +158,9 @@ def ActPirate(pirate):
         island_c[int(w[-1])*2-1]=y-1
         
     elif (
-        ((w== "island1" and s[0] != "myCaptured")
-        or (w == "island2" and s[1] != "myCaptured")
-        or (w == "island3" and s[2] != "myCaptured"))
+        ((w== "island1" and st[0] != "myCaptured")
+        or (w == "island2" and st[1] != "myCaptured")
+        or (w == "island3" and st[2] != "myCaptured"))
     ):
         sig=w[-1]+str(x-2)+","+str(y)
         pirate.setTeamSignal(sig)
@@ -168,9 +168,9 @@ def ActPirate(pirate):
         island_c[int(w[-1])*2-1]=y
         
     elif(
-         ((sw == "island1" and s[0] != "myCaptured")
-        or (sw == "island2" and s[1] != "myCaptured")
-        or (sw == "island3" and s[2] != "myCaptured"))
+         ((sw == "island1" and st[0] != "myCaptured")
+        or (sw == "island2" and st[1] != "myCaptured")
+        or (sw == "island3" and st[2] != "myCaptured"))
     ):
         sig=sw[-1]+str(x-2)+","+str(y+2)
         pirate.setTeamSignal(sig)
@@ -178,9 +178,9 @@ def ActPirate(pirate):
         island_c[int(sw[-1])*2-1]=y+2
         
     elif(
-        ((nw == "island1" and s[0] != "myCaptured")
-        or (nw == "island2" and s[1] != "myCaptured")
-        or (nw == "island3" and s[2] != "myCaptured"))
+        ((nw == "island1" and st[0] != "myCaptured")
+        or (nw == "island2" and st[1] != "myCaptured")
+        or (nw == "island3" and st[2] != "myCaptured"))
     ):
         sig=nw[-1]+str(x-2)+","+str(y-2)
         pirate.setTeamSignal(sig)
@@ -188,9 +188,9 @@ def ActPirate(pirate):
         island_c[int(nw[-1])*2-1]=y-2
         
     elif(
-        ((s == "island1" and s[0] != "myCaptured")
-        or (s == "island2" and s[1] != "myCaptured")
-        or (s == "island3" and s[2] != "myCaptured"))
+        ((s == "island1" and st[0] != "myCaptured")
+        or (s == "island2" and st[1] != "myCaptured")
+        or (s == "island3" and st[2] != "myCaptured"))
         and
         sw=="blank"
     ):
@@ -200,9 +200,9 @@ def ActPirate(pirate):
         island_c[int(s[-1])*2-1]=y+2
         
     elif(
-        ((s == "island1" and s[0] != "myCaptured")
-        or (s == "island2" and s[1] != "myCaptured")
-        or (s == "island3" and s[2] != "myCaptured"))
+        ((s == "island1" and st[0] != "myCaptured")
+        or (s == "island2" and st[1] != "myCaptured")
+        or (s == "island3" and st[2] != "myCaptured"))
         and
         se=="blank"
     ):
@@ -212,9 +212,9 @@ def ActPirate(pirate):
         island_c[int(s[-1])*2-1]=y+2
         
     elif(
-        ((s == "island1" and s[0] != "myCaptured")
-        or (s == "island2" and s[1] != "myCaptured")
-        or (s == "island3" and s[2] != "myCaptured"))
+        ((s == "island1" and st[0] != "myCaptured")
+        or (s == "island2" and st[1] != "myCaptured")
+        or (s == "island3" and st[2] != "myCaptured"))
     ):
         sig=s[-1]+str(x)+","+str(y+2)
         pirate.setTeamSignal(sig)
@@ -222,9 +222,9 @@ def ActPirate(pirate):
         island_c[int(s[-1])*2-1]=y+2
              
     elif(
-        ((n == "island1" and s[0] != "myCaptured")
-        or (n == "island2" and s[1] != "myCaptured")
-        or (n == "island3" and s[2] != "myCaptured"))
+        ((n == "island1" and st[0] != "myCaptured")
+        or (n == "island2" and st[1] != "myCaptured")
+        or (n == "island3" and st[2] != "myCaptured"))
         and
         nw=="blank"
     ):
@@ -234,9 +234,9 @@ def ActPirate(pirate):
         island_c[int(n[-1])*2-1]=y-2
        
     elif(
-        ((n == "island1" and s[0] != "myCaptured")
-        or (n == "island2" and s[1] != "myCaptured")
-        or (n == "island3" and s[2] != "myCaptured"))
+        ((n == "island1" and st[0] != "myCaptured")
+        or (n == "island2" and st[1] != "myCaptured")
+        or (n == "island3" and st[2] != "myCaptured"))
         and
         ne=="blank"
     ):
@@ -246,9 +246,9 @@ def ActPirate(pirate):
         island_c[int(n[-1])*2-1]=y-2
         
     elif(
-        ((n == "island1" and s[0] != "myCaptured")
-        or (n == "island2" and s[1] != "myCaptured")
-        or (n == "island3" and s[2] != "myCaptured"))
+        ((n == "island1" and st[0] != "myCaptured")
+        or (n == "island2" and st[1] != "myCaptured")
+        or (n == "island3" and st[2] != "myCaptured"))
     ):
         sig=n[-1]+str(x)+","+str(y-2)
         pirate.setTeamSignal(sig)
@@ -274,5 +274,18 @@ def ActPirate(pirate):
 
 
 def ActTeam(team):
-    # complete this function
+    l = team.trackPlayers()
+    s = team.getTeamSignal()
+
+    team.buildWalls(1)
+    team.buildWalls(2)   
+    team.buildWalls(3)
+    # print(team.getTeamSignal())
+    # print(team.trackPlayers())
+    if s:
+        island_no = int(s[0])
+        signal = l[island_no - 1]
+        if signal == "myCaptured":
+            team.setTeamSignal("")
+
     pass
