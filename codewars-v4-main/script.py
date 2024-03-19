@@ -1,7 +1,7 @@
 import random
 import math
 
-name = "script"
+name = "script1"
 
 
 def moveTo(x, y, Pirate):
