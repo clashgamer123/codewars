@@ -1,9 +1,7 @@
+
 import random
 import math
-
-name = "script"
-
-
+name="Cobra"
 def moveTo(x, y, Pirate):
     position = Pirate.getPosition()
     if position[0] == x and position[1] == y:
@@ -16,8 +14,6 @@ def moveTo(x, y, Pirate):
         return (position[0] > x) * 2 + 2
     else:
         return (position[1] < y) * 2 + 1
-
-
 def moveAway(x, y, Pirate):
     position = Pirate.getPosition()
     if position[0] == x and position[1] == y:
@@ -26,52 +22,6 @@ def moveAway(x, y, Pirate):
         return (position[0] < x) * 2 + 2
     else:
         return (position[1] > y) * 2 + 1
-
-def circleAround(x, y, radius, Pirate, initial="abc", clockwise=True):
-    position = Pirate.getPosition()
-    rx = position[0]
-    ry = position[1]
-    pos = [[x + i, y + radius] for i in range(-1 * radius, radius + 1)]
-    pos.extend([[x + radius, y + i] for i in range(radius - 1, -1 * radius - 1, -1)])
-    pos.extend([[x + i, y - radius] for i in range(radius - 1, -1 * radius - 1, -1)])
-    pos.extend([[x - radius, y + i] for i in range(-1 * radius + 1, radius)])
-    if [rx, ry] not in pos:
-        if initial != "abc":
-            return moveTo(initial[0], initial[1], Pirate)
-        if rx in [x + i for i in range(-1 * radius, radius + 1)] and ry in [
-            y + i for i in range(-1 * radius, radius + 1)
-        ]:
-            return moveAway(x, y, Pirate)
-        else:
-            return moveTo(x, y, Pirate)
-    else:
-        index = pos.index([rx, ry])
-        return moveTo(
-            pos[(index + (clockwise * 2) - 1) % len(pos)][0],
-            pos[(index + (clockwise * 2) - 1) % len(pos)][1],
-            Pirate,
-        )
-    
-def checkIsland(pirate):
-    up = pirate.investigate_up()
-    down = pirate.investigate_down()
-    left = pirate.investigate_left()
-    right = pirate.investigate_right()
-    if (up[0:-1] == "island" or down[0:-1] == "island") and (left[0:-1] == "island" or right[0:-1] == "island"):
-        return True
-    else:
-        return False
-
-island_c=[0,0,0,0,0,0]
-island_order=[]
-i=0
-deploy_p=[20,20]
-j=0
-k=0
-pirate_divider_1=0
-pirate_divider_2=0
-island_pirates_1=[]
-island_pirates_2=[]
 
 def ActPirate(pirate):
     n= pirate.investigate_up()[0]
@@ -82,46 +32,36 @@ def ActPirate(pirate):
     se= pirate.investigate_se()[0]
     nw= pirate.investigate_nw()[0]
     sw= pirate.investigate_sw()[0]
-    x, y = pirate.getPosition()
-    pirate.setSignal("")
-    st = pirate.trackPlayers()
-    sig=""
-    
-    global island_c
-    global deploy_p
-    global i
-    global j,k
-    global pirate_divider_1
-    global pirate_divider_2
-    global island_pirates_1
-    global island_pirates_2
-    global island_order
-    
-    def verify(list_pirates,pirate):
-        if pirate.getID() not in list_pirates: return False
-        else: return True
-    
-    if i==1 :
-        deploy_p=[x,y]
-    else: pass
-    
+    p,q=pirate.getDeployPoint()
+    x,y = pirate.getPosition()
+    a=pirate.getDimensionX()
+    b=pirate.getDimensionY()
+    signal=pirate.getTeamSignal()
+    st=pirate.trackPlayers()
+
+    if signal != "":
+        k = signal.split(",")
+        if len(k)==5:
+            z = [k[1],k[2],k[3],k[4],"0","0","0","0","0","0","0","0"]
+        elif len(k)==9:
+            z = [k[1],k[2],k[3],k[4],k[5],k[6],k[7],k[8],"0","0","0","0"]
+        elif len(k)==13:
+            z= [k[1],k[2],k[3],k[4],k[5],k[6],k[7],k[8],k[9],k[10],k[11],k[12]]
+        else:
+            z = ["0","0","0","0","0","0","0","0","0","0","0","0"]
+    else:
+        z = ["0","0","0","0","0","0","0","0","0","0","0","0"]
     
     if (
-        ((e == "island1" and st[0] != "myCaptured") 
-        or (e == "island2" and st[1] != "myCaptured") 
+        ((e == "island1" and st[0] != "myCaptured")
+        or (e == "island2" and st[1] != "myCaptured")
         or (e == "island3" and st[2] != "myCaptured"))
         and
         ((se=='blank'))
     ):
-        if (j==0): 
-            j=i
-        sig=e[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(e[-1])*2-2]=x+2
-        island_c[int(e[-1])*2-1]=y-1 
-        if int(e[-1]) not in island_order:
-            island_order.append(int(e[-1])) 
-        if len(island_order)==2 and k==0: k=i
+        sig=e[-1]+","+str(x+2)+","+str(y-1)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif (
         ((e == "island1" and st[0] != "myCaptured")
@@ -130,60 +70,36 @@ def ActPirate(pirate):
         and
         ((ne=='blank'))
     ):
-        if (j==0):
-            j=i
-        sig=e[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(e[-1])*2-2]=x+2
-        island_c[int(e[-1])*2-1]=y+1
-        if int(e[-1]) not in island_order:
-            island_order.append(int(e[-1]))
-        if len(island_order)==2 and k==0: k=i
-        
+        sig=e[-1]+","+str(x+2)+","+str(y+1)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
+                
     elif (
         ((e == "island1" and st[0] != "myCaptured")
         or (e == "island2" and st[1] != "myCaptured")
         or (e == "island3" and st[2] != "myCaptured"))
     ):
-        if (j==0): 
-            j=i
-        sig=e[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(e[-1])*2-2]=x+2
-        island_c[int(e[-1])*2-1]=y
-        if int(e[-1]) not in island_order:
-            island_order.append(int(e[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=e[-1]+","+str(x+2)+","+str(y)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif (
         ((se == "island1" and st[0] != "myCaptured")
         or (se == "island2" and st[1] != "myCaptured")
         or (se == "island3" and st[2] != "myCaptured"))
     ):
-        if (j==0): 
-            j=i
-        sig=se[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(se[-1])*2-2]=x+2
-        island_c[int(se[-1])*2-1]=y+2
-        if int(se[-1]) not in island_order:
-            island_order.append(int(se[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=se[-1]+","+str(x+2)+","+str(y+2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif (
         ((ne == "island1" and st[0] != "myCaptured")
         or (ne == "island2" and st[1] != "myCaptured")
         or (ne == "island3" and st[2] != "myCaptured"))
     ):
-        if (j==0): 
-            j=i
-        sig=ne[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(ne[-1])*2-2]=x+2
-        island_c[int(ne[-1])*2-1]=y-2
-        if int(ne[-1]) not in island_order:
-            island_order.append(int(ne[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=ne[-1]+","+str(x+2)+","+str(y-2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif (
         ((w== "island1" and st[0] != "myCaptured")
@@ -192,15 +108,9 @@ def ActPirate(pirate):
         and
         nw=="blank"
     ):
-        if (j==0): 
-            j=i
-        sig=w[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(w[-1])*2-2]=x-2
-        island_c[int(w[-1])*2-1]=y+1
-        if int(w[-1]) not in island_order:
-            island_order.append(int(w[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=w[-1]+","+str(x-2)+","+str(y+1)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif (
         ((w== "island1" and st[0] != "myCaptured")
@@ -209,60 +119,36 @@ def ActPirate(pirate):
         and
         sw=="blank"
     ):
-        if (j==0): 
-            j=i
-        sig=w[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(w[-1])*2-2]=x-2
-        island_c[int(w[-1])*2-1]=y-1
-        if int(w[-1]) not in island_order:
-            island_order.append(int(w[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=w[-1]+","+str(x-2)+","+str(y-1)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif (
         ((w== "island1" and st[0] != "myCaptured")
         or (w == "island2" and st[1] != "myCaptured")
         or (w == "island3" and st[2] != "myCaptured"))
     ):
-        if (j==0): 
-            j=i
-        sig=w[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(w[-1])*2-2]=x-2
-        island_c[int(w[-1])*2-1]=y
-        if int(w[-1]) not in island_order:
-            island_order.append(int(w[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=w[-1]+","+str(x-2)+","+str(y)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif(
          ((sw == "island1" and st[0] != "myCaptured")
         or (sw == "island2" and st[1] != "myCaptured")
         or (sw == "island3" and st[2] != "myCaptured"))
     ):
-        if (j==0): 
-            j=i
-        sig=sw[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(sw[-1])*2-2]=x-2
-        island_c[int(sw[-1])*2-1]=y+2
-        if int(sw[-1]) not in island_order:
-            island_order.append(int(sw[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=sw[-1]+","+str(x-2)+","+str(y+2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif(
         ((nw == "island1" and st[0] != "myCaptured")
         or (nw == "island2" and st[1] != "myCaptured")
         or (nw == "island3" and st[2] != "myCaptured"))
     ):
-        if (j==0): 
-            j=i
-        sig=nw[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(nw[-1])*2-2]=x-2
-        island_c[int(nw[-1])*2-1]=y-2
-        if int(nw[-1]) not in island_order:
-            island_order.append(int(nw[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=nw[-1]+","+str(x-2)+","+str(y-2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif(
         ((s == "island1" and st[0] != "myCaptured")
@@ -271,15 +157,9 @@ def ActPirate(pirate):
         and
         sw=="blank"
     ):
-        if (j==0): 
-            j=i
-        sig=s[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(s[-1])*2-2]=x+1
-        island_c[int(s[-1])*2-1]=y+2
-        if int(s[-1]) not in island_order:
-            island_order.append(int(s[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=s[-1]+","+str(x+1)+","+str(y+2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif(
         ((s == "island1" and st[0] != "myCaptured")
@@ -288,30 +168,18 @@ def ActPirate(pirate):
         and
         se=="blank"
     ):
-        if (j==0): 
-            j=i
-        sig=s[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(s[-1])*2-2]=x-1
-        island_c[int(s[-1])*2-1]=y+2
-        if int(s[-1]) not in island_order:
-            island_order.append(int(s[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=s[-1]+","+str(x-1)+","+str(y+2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif(
         ((s == "island1" and st[0] != "myCaptured")
         or (s == "island2" and st[1] != "myCaptured")
         or (s == "island3" and st[2] != "myCaptured"))
     ):
-        if (j==0): 
-            j=i
-        sig=s[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(s[-1])*2-2]=x
-        island_c[int(s[-1])*2-1]=y+2
-        if int(s[-1]) not in island_order:
-            island_order.append(int(s[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=s[-1]+","+str(x)+","+str(y+2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
              
     elif(
         ((n == "island1" and st[0] != "myCaptured")
@@ -320,15 +188,9 @@ def ActPirate(pirate):
         and
         nw=="blank"
     ):
-        if (j==0): 
-            j=i
-        sig=n[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(n[-1])*2-2]=x+1
-        island_c[int(n[-1])*2-1]=y-2
-        if int(n[-1]) not in island_order:
-            island_order.append(int(n[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=n[-1]+","+str(x+1)+","+str(y-2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
        
     elif(
         ((n == "island1" and st[0] != "myCaptured")
@@ -337,111 +199,112 @@ def ActPirate(pirate):
         and
         ne=="blank"
     ):
-        if (j==0): 
-            j=i
-        sig=n[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(n[-1])*2-2]=x-1
-        island_c[int(n[-1])*2-1]=y-2
-        if int(n[-1]) not in island_order:
-            island_order.append(int(n[-1]))
-        if len(island_order)==2 and k==0: k=i
+        sig=n[-1]+","+str(x-1)+","+str(y-2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
         
     elif(
         ((n == "island1" and st[0] != "myCaptured")
         or (n == "island2" and st[1] != "myCaptured")
         or (n == "island3" and st[2] != "myCaptured"))
     ):
-        if (j==0): 
-            j=i
-        sig=n[-1]
-        pirate.setTeamSignal(sig)
-        island_c[int(n[-1])*2-2]=x
-        island_c[int(n[-1])*2-1]=y-2
-        if int(n[-1]) not in island_order:
-            island_order.append(int(n[-1]))
-        if len(island_order)==2 and k==0: k=i
-        
-    else: 
-        pass 
-
-    if len(island_order)==0:
-        return moveAway(deploy_p[0],deploy_p[1],pirate)
-    
-    elif len(island_order)==1:
-        m=island_order[0]
-        if(i<j+10):
-            if sig!="":
-                if not(verify(island_pirates_1,pirate)):
-                    island_pirates_1.append(pirate.getID())
-            return moveTo(island_c[2*m-2],island_c[2*m-1],pirate)
-        elif i>j+10:
-            if verify(island_pirates_1,pirate) and st[m-1]!="myCaptured" :
-                return moveTo(island_c[2*m-2],island_c[2*m-1],pirate)
-            else:
-                pirate_divider_1+=1
-                if (pirate_divider_1%2==0) :
-                    return moveAway(island_c[2*m-2],island_c[2*m-1],pirate)
+        sig=n[-1]+","+str(x)+","+str(y-2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
+    else:
+        pass
+    k=pirate.getTeamSignal().split(",")
+    t=k[0]
+    if t=="":
+        u,v=int(a/2),int(b/2)
+        if ((x==p)and(y==q)):
+            i=int(pirate.getID())
+            r=i%u
+            if random.randint(1, 2) == 1:
+                if(q==0):
+                    pirate.setSignal(str(a-p)+","+str(v-r))
                 else:
-                    return moveAway(deploy_p[0],deploy_p[1],pirate)
-                
-    elif len(island_order)==2 :
-        m=island_order[1]
-        if verify(island_pirates_1,pirate):
-            if st[island_order[0]-1]!="myCaptured":
-                return 0
+                    pirate.setSignal(str(a-p)+","+str(v+r))
             else:
-                pass
-        else:
-            if i<=k+20:
-                if sig==f"{m}":
-                    if not(verify(island_pirates_2,pirate)) :
-                        island_pirates_2.append(pirate.getID())
-                return moveTo(island_c[2*m-2],island_c[2*m-1],pirate)
-            
-            elif i>k+20:
-                if verify(island_pirates_2,pirate) and st[m-1]!="myCaptured":
-                    return moveTo(island_c[2*m-2],island_c[2*m-1],pirate)
+                if(p==0):
+                    pirate.setSignal(str(u-r)+","+str(b-q))
                 else:
-                    pirate_divider_2+=1
-                    if pirate_divider_2%2==0:
-                        return moveAway((island_c[island_order[0]*2-2]),(island_c[2*island_order[0]-1]),pirate)
-                    else:
-                        return moveAway(island_c[2*m-2],island_c[2*m-1],pirate)
+                    pirate.setSignal(str(u+r)+","+str(b-q))
+        s=pirate.getSignal()
+        l=s.split(",")
+        m,n=int(l[0]),int(l[1])
+        return moveTo(m,n,pirate)
+    elif t=="Refresh1":
+        pirate.setSignal(str(p)+","+str(q))
+        return random.randint(1, 4)
+    elif t=="Attack":
+        if ((x==p)and(y==q)):
+            pirate.setSignal(str(p)+","+str(q))
+        elif((x==0)and(y==0)):
+            pirate.setSignal(str(0)+","+str(0))
+        elif((x==a-1)and(y==0)):
+            pirate.setSignal(str(a-1)+","+str(0))
+        elif((x==0)and(y==b-1)):
+            pirate.setSignal(str(0)+","+str(b-1))
+        elif((x==a-1)and(y==b-1)):
+            pirate.setSignal(str(a-1)+","+str(b-1))
+        elif((x==a-1)or(x==0)or(y==0)or(y==b-1)):
+            pirate.setSignal(str(x)+","+str(y))
+        s=pirate.getSignal()
+        l=s.split(",")
+        m,n=int(l[0]),int(l[1])
+        return moveAway(m,n,pirate)
     
-    elif len(island_order)==3:
-        m=island_order[2]
-        if verify(island_pirates_1,pirate) :
-            if st[island_order[0]-1]!="myCaptured":
-                return 0
-            else: pass    
-        elif verify(island_pirates_2,pirate) : 
-            if st[island_order[1]-1]!="myCaptured":
-                return 0
-            else : pass
-        else:
-            if st[m-1]!="myCaptured":
-                moveTo(island_c[2*m-2],island_c[2*m-1],pirate)
-            else :
-                return random.randint(1,4)
-            
-    pass
-
+    elif t[0:7]=="Capture":
+        f=(int(pirate.getID()))%3
+        if f==0:
+            if not(x==int(k[2]) and y==int(k[3])):
+                t=t[0:7]+"0"+t[8:]
+                k[0]=t
+                z=','.join(k)
+                pirate.setTeamSignal(z)
+            return moveTo(int(k[2]),int(k[3]),pirate)
+        elif f==1:
+            if not(x==int(k[6])and y==(int(k[7]))):
+                t=t[0:8]+"0"+t[9]
+                k[0]=t
+                z=','.join(k)
+                pirate.setTeamSignal(z)
+            return moveTo(int(k[6]),int(k[7]),pirate)
+        elif f==2:
+            if not(x==int(k[10]) and y==int(k[11])):
+                t=t[0:9]+"0"
+                k[0]=t
+                z=','.join(k)
+                pirate.setTeamSignal(z)
+            return moveTo(int(k[10]),int(k[11]),pirate)
 
 def ActTeam(team):
-    global dimX,dimY
-    dimX=team.getDimensionX()
-    dimY=team.getDimensionY()
-    l = team.trackPlayers()
-    s = team.getTeamSignal()
-    
-    global i
-    i+=1
-    
-    team.buildWalls(1)
-    team.buildWalls(2)   
-    team.buildWalls(3)
-    # print(team.getTeamSignal())
-    # print(team.trackPlayers())
-    team.setTeamSignal("")
-    pass
+    time=team.getCurrentFrame()
+    ts=team.getTeamSignal()
+    k=ts.split(",")
+    t=k[0]
+    if((t=="")and(time>70)):
+        k[0]="Refresh1"
+        z=','.join(k)
+        team.setTeamSignal(z)
+    if(t=="Refresh1"):
+        k[0]="Attack"
+        z=','.join(k)
+        team.setTeamSignal(z)
+    elif((t=="Attack")and(time>200)):
+        k[0]="Capture111"
+        z=','.join(k)
+        team.setTeamSignal(z)
+    elif time>200:
+        if(int(t[7])==1):
+            team.buildWalls(int(k[1]))
+        if(int(t[8])==1):
+            team.buildWalls(int(k[5]))
+        if(int(t[9])==1):
+            team.buildWalls(int(k[9]))
+        k[0]="Capture111"
+        z=','.join(k)
+        team.setTeamSignal(z)
+
+    return 0
