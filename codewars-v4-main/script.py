@@ -278,6 +278,8 @@ def ActPirate(pirate):
                 z=','.join(k)
                 pirate.setTeamSignal(z)
             return moveTo(int(k[10]),int(k[11]),pirate)
+        else:
+            return random.randin(1,4)
 
 def ActTeam(team):
     time=team.getCurrentFrame()
