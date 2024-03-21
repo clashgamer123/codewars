@@ -222,14 +222,14 @@ def ActPirate(pirate):
             r=i%u
             if random.randint(1, 2) == 1:
                 if(q==0):
-                    pirate.setSignal(str(a-p)+","+str(v-r))
+                    pirate.setSignal(str(a-p-1)+","+str(v-r))
                 else:
-                    pirate.setSignal(str(a-p)+","+str(v+r))
+                    pirate.setSignal(str(a-p-1)+","+str(v+r))
             else:
                 if(p==0):
-                    pirate.setSignal(str(u-r)+","+str(b-q))
+                    pirate.setSignal(str(u-r)+","+str(b-q-1))
                 else:
-                    pirate.setSignal(str(u+r)+","+str(b-q))
+                    pirate.setSignal(str(u+r)+","+str(b-q-1))
         s=pirate.getSignal()
         l=s.split(",")
         m,n=int(l[0]),int(l[1])
