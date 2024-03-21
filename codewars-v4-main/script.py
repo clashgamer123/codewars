@@ -257,21 +257,21 @@ def ActPirate(pirate):
     
     elif t[0:7]=="Capture":
         f=(int(pirate.getID()))%3
-        if f==0:
+        if f==0 and len(k)>4:
             if not(x==int(k[2]) and y==int(k[3])):
                 t=t[0:7]+"0"+t[8:]
                 k[0]=t
                 z=','.join(k)
                 pirate.setTeamSignal(z)
             return moveTo(int(k[2]),int(k[3]),pirate)
-        elif f==1:
+        elif f==1 and len(k)>8:
             if not(x==int(k[6])and y==(int(k[7]))):
                 t=t[0:8]+"0"+t[9]
                 k[0]=t
                 z=','.join(k)
                 pirate.setTeamSignal(z)
             return moveTo(int(k[6]),int(k[7]),pirate)
-        elif f==2:
+        elif f==2 and len(k)>12:
             if not(x==int(k[10]) and y==int(k[11])):
                 t=t[0:9]+"0"
                 k[0]=t
