@@ -299,11 +299,11 @@ def ActTeam(team):
         z=','.join(k)
         team.setTeamSignal(z)
     elif time>200:
-        if(int(t[7])==1):
+        if(int(t[7])==1 and len(k)>4):
             team.buildWalls(int(k[1]))
-        if(int(t[8])==1):
+        if(int(t[8])==1 and len(k)>8):
             team.buildWalls(int(k[5]))
-        if(int(t[9])==1):
+        if(int(t[9])==1 and len(k)>12):
             team.buildWalls(int(k[9]))
         k[0]="Capture111"
         z=','.join(k)
