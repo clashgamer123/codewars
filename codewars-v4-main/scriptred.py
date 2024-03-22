@@ -270,7 +270,6 @@ def ActPirate(pirate):
             pirate.setSignal(str(d*a//6)+","+str(g*b//6))
         elif ((x==m)and(y==n)):
             pirate.setSignal("-1,-1")
-            print("Reached")
         if s=="-1,-1":
             return random.randint(1, 4)
         else:
