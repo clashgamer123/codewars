@@ -59,30 +59,6 @@ def moveAwayBounded(x,y,x1,x2,y1,y2,Pirate):
     
     return random.choice(list)         
     
-def circleAround(x, y, radius, Pirate, initial="abc", clockwise=True):
-    position = Pirate.getPosition()
-    rx = position[0]
-    ry = position[1]
-    pos = [[x + i, y + radius] for i in range(-1 * radius, radius + 1)]
-    pos.extend([[x + radius, y + i] for i in range(radius - 1, -1 * radius - 1, -1)])
-    pos.extend([[x + i, y - radius] for i in range(radius - 1, -1 * radius - 1, -1)])
-    pos.extend([[x - radius, y + i] for i in range(-1 * radius + 1, radius)])
-    if [rx, ry] not in pos:
-        if initial != "abc":
-            return moveTo(initial[0], initial[1], Pirate)
-        if rx in [x + i for i in range(-1 * radius, radius + 1)] and ry in [
-            y + i for i in range(-1 * radius, radius + 1)
-        ]:
-            return moveAway(x, y, Pirate)
-        else:
-            return moveTo(x, y, Pirate)
-    else:
-        index = pos.index([rx, ry])
-        return moveTo(
-            pos[(index + (clockwise * 2) - 1) % len(pos)][0],
-            pos[(index + (clockwise * 2) - 1) % len(pos)][1],
-            Pirate,
-        )
 
 def enemy_kill(x,y,Pirate):
     n1= Pirate.investigate_up()[1]
@@ -95,34 +71,40 @@ def enemy_kill(x,y,Pirate):
     sw1=Pirate.investigate_sw()[1]
     r=Pirate.getPosition()
     p=Pirate.getDeployPoint()
+    time=Pirate.getCurrentFrame()
     if r[0]==x and r[1]==y :
         if (n1=="enemy" or n1=="both"):
-            Pirate.setSignal(str(x)+","+str(y-1))
+            Pirate.setSignal(str(x)+","+str(y-1)+","+str(time))
         elif (e1=="enemy" or e1=="both"):
-            Pirate.setSignal(str(x+1)+","+str(y))
+            Pirate.setSignal(str(x+1)+","+str(y)+","+str(time))
         elif (s1=="enemy" or s1=="both"):
-            Pirate.setSignal(str(x)+","+str(y+1))
+            Pirate.setSignal(str(x)+","+str(y+1)+","+str(time))
         elif (w1=="enemy" or w1=="both"):
-            Pirate.setSignal(str(x-1)+","+str(y))
+            Pirate.setSignal(str(x-1)+","+str(y)+","+str(time))
         elif (ne1=="enemy" or ne1=="both"):
-            Pirate.setSignal(str(x+1)+","+str(y-1))
+            Pirate.setSignal(str(x+1)+","+str(y-1)+","+str(time))
         elif (nw1=="enemy" or nw1=="both"):
-            Pirate.setSignal(str(x-1)+","+str(y-1))
+            Pirate.setSignal(str(x-1)+","+str(y-1)+","+str(time))
         elif (se1=="enemy" or se1=="both"):
-            Pirate.setSignal(str(x+1)+","+str(y+1))
+            Pirate.setSignal(str(x+1)+","+str(y+1)+","+str(time))
         elif (sw1=="enemy" or sw1=="both"):
-            Pirate.setSignal(str(x-1)+","+str(y+1))
+            Pirate.setSignal(str(x-1)+","+str(y+1)+","+str(time))
         else : pass
+            
     s=Pirate.getSignal()
-    if (s==f"{p[0]},{p[1]}" or s==str(x)+","+str(y)) : return 0
+    if (s==str(p[0])+","+str(p[1])+",0") : return 0
+    print(s)
     l=s.split(",")
-    m,n=int(l[0]),int(l[1])
-    if(r[0]==m and r[1]==n):
-        Pirate.setSignal(str(x)+","+str(y))
+    m,n,t=int(l[0]),int(l[1]),int(l[2])
+    if(r[0]==m and r[1]==n) and time>=t+10:
+        Pirate.setSignal(str(x)+","+str(y)+","+str(t))
+        
     s=Pirate.getSignal()
     l=s.split(",")
     m,n=int(l[0]),int(l[1])
     return moveTo(m,n,Pirate)
+
+
  
 def ActPirate(pirate):
     n= pirate.investigate_up()[0]
@@ -140,7 +122,7 @@ def ActPirate(pirate):
     signal=pirate.getTeamSignal()
     st=pirate.trackPlayers()
     time=pirate.getCurrentFrame()
-    
+    tr=pirate.trackPlayers()
     u,v=int(a/2),int(b/2)
 
     if signal != "":
@@ -187,23 +169,7 @@ def ActPirate(pirate):
         if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
             pirate.setTeamSignal(signal +","+ sig)
         
-    elif (
-        ((se == "island1" and st[0] != "myCaptured")
-        or (se == "island2" and st[1] != "myCaptured")
-        or (se == "island3" and st[2] != "myCaptured"))
-    ):
-        sig=se[-1]+","+str(x+2)+","+str(y+2)+","+str(pirate.getCurrentFrame())
-        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
-            pirate.setTeamSignal(signal +","+ sig)
-        
-    elif (
-        ((ne == "island1" and st[0] != "myCaptured")
-        or (ne == "island2" and st[1] != "myCaptured")
-        or (ne == "island3" and st[2] != "myCaptured"))
-    ):
-        sig=ne[-1]+","+str(x+2)+","+str(y-2)+","+str(pirate.getCurrentFrame())
-        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
-            pirate.setTeamSignal(signal +","+ sig)
+    
         
     elif (
         ((w== "island1" and st[0] != "myCaptured")
@@ -236,23 +202,7 @@ def ActPirate(pirate):
         if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
             pirate.setTeamSignal(signal +","+ sig)
         
-    elif(
-         ((sw == "island1" and st[0] != "myCaptured")
-        or (sw == "island2" and st[1] != "myCaptured")
-        or (sw == "island3" and st[2] != "myCaptured"))
-    ):
-        sig=sw[-1]+","+str(x-2)+","+str(y+2)+","+str(pirate.getCurrentFrame())
-        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
-            pirate.setTeamSignal(signal +","+ sig)
-        
-    elif(
-        ((nw == "island1" and st[0] != "myCaptured")
-        or (nw == "island2" and st[1] != "myCaptured")
-        or (nw == "island3" and st[2] != "myCaptured"))
-    ):
-        sig=nw[-1]+","+str(x-2)+","+str(y-2)+","+str(pirate.getCurrentFrame())
-        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
-            pirate.setTeamSignal(signal +","+ sig)
+   
         
     elif(
         ((s == "island1" and st[0] != "myCaptured")
@@ -315,6 +265,42 @@ def ActPirate(pirate):
         sig=n[-1]+","+str(x)+","+str(y-2)+","+str(pirate.getCurrentFrame())
         if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
             pirate.setTeamSignal(signal +","+ sig)
+    
+    elif (
+        ((se == "island1" and st[0] != "myCaptured")
+        or (se == "island2" and st[1] != "myCaptured")
+        or (se == "island3" and st[2] != "myCaptured"))
+    ):
+        sig=se[-1]+","+str(x+2)+","+str(y+2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
+        
+    elif (
+        ((ne == "island1" and st[0] != "myCaptured")
+        or (ne == "island2" and st[1] != "myCaptured")
+        or (ne == "island3" and st[2] != "myCaptured"))
+    ):
+        sig=ne[-1]+","+str(x+2)+","+str(y-2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
+    
+    elif(
+         ((sw == "island1" and st[0] != "myCaptured")
+        or (sw == "island2" and st[1] != "myCaptured")
+        or (sw == "island3" and st[2] != "myCaptured"))
+    ):
+        sig=sw[-1]+","+str(x-2)+","+str(y+2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
+        
+    elif(
+        ((nw == "island1" and st[0] != "myCaptured")
+        or (nw == "island2" and st[1] != "myCaptured")
+        or (nw == "island3" and st[2] != "myCaptured"))
+    ):
+        sig=nw[-1]+","+str(x-2)+","+str(y-2)+","+str(pirate.getCurrentFrame())
+        if (z[-12] != sig[0] and z[-8]!= sig[0] and z[-4] != sig[0] ):
+            pirate.setTeamSignal(signal +","+ sig)
     else:
         pass
     
@@ -360,15 +346,16 @@ def ActPirate(pirate):
         return moveAway(m,n,pirate)
     
     elif t=="Refresh2":
-        pirate.setSignal(str(p)+","+str(q))
+        pirate.setSignal(str(p)+","+str(q)+",0")
         return random.randint(1, 4)
         
     elif t[0:7]=="Capture":
         f=(int(pirate.getID()))%4
+        
         if (len(k)==5):
-            if (f==0):
-                s=pirate.getSignal()
-                if not(x==int(k[2]) and y==int(k[3])) and s==f"{p},{q}":
+            s=pirate.getSignal()
+            if ((f==0) and s!=""):
+                if not(x==int(k[2]) and y==int(k[3])) and s==f"{p},{q},0":
                     t=t[0:7]+"0"+t[8:]
                     k[0]=t
                     z=','.join(k)
@@ -376,8 +363,8 @@ def ActPirate(pirate):
                     return moveTo(int(k[2]),int(k[3]),pirate)
                 else:
                     return enemy_kill(int(k[2]),int(k[3]),pirate)    
-            elif (f==1 or f==2):
-                if (time==6*a+1):
+            elif ((f==1 or f==2) and s!=""):
+                if (time==4*a+1):
                     pirate.setSignal(str(a-1-p)+","+str(b-1-q))
                 else:
                     d=q<v
@@ -389,11 +376,11 @@ def ActPirate(pirate):
                 m,n=int(l[0]),int(l[1])
                 return moveAway(m,n,pirate)
             else :
-                o=(int(pirate.getID())-3)/4
+                o=int((int(pirate.getID())-3)/4)
                 if(o%4==0):
-                    if(time<=6.5*a):
+                    if(time<=4.5*a):
                         return moveTo(3*(u//2),(v)//2,pirate)
-                    elif(time==6.5*a+1):
+                    elif(time==4.5*a+1):
                         pirate.setSignal(str(3*(u//2))+","+str(v//2))
                     else:
                         if(x==u or x==a-1 or y==0 or y==v-1):
@@ -403,9 +390,9 @@ def ActPirate(pirate):
                     m,n=int(l[0]),int(l[1])
                     return moveAwayBounded(m,n,u,a-1,0,v-1,pirate)
                 elif(o%4==1):
-                    if(time<=7.5*a):
+                    if(time<=5.5*a):
                         return moveTo(u//2,v//2,pirate)
-                    elif(time==7.5*a+1):
+                    elif(time==5.5*a+1):
                         pirate.setSignal(str(u//2)+","+str(v//2))
                     else:
                         if(x==u-1 or x==0 or y==0 or y==v-1):
@@ -415,9 +402,9 @@ def ActPirate(pirate):
                     m,n=int(l[0]),int(l[1])
                     return moveAwayBounded(m,n,0,u-1,0,v-1,pirate)
                 elif(o%4==2):
-                    if(time<=7.5*a):
+                    if(time<=5.5*a):
                         return moveTo(u//2,3*(v//2),pirate)
-                    elif(time==7.5*a+1):
+                    elif(time==5.5*a+1):
                         pirate.setSignal(str(u//2)+","+str(3*(v//2)))
                     else:
                         if(x==u-1 or x==0 or y==b-1 or y==v):
@@ -427,9 +414,9 @@ def ActPirate(pirate):
                     m,n=int(l[0]),int(l[1])
                     return moveAwayBounded(m,n,0,u-1,v,b-1,pirate)
                 else:
-                    if(time<=7.5*a):
+                    if(time<=5.5*a):
                         return moveTo(3*(u//2),3*(v//2),pirate)
-                    elif(time==7.5*a+1):
+                    elif(time==5.5*a+1):
                         pirate.setSignal(str(3*(u//2))+","+str(3*(v//2)))
                     else:
                         if(x==u or x==a-1 or y==b-1 or y==v):
@@ -441,10 +428,10 @@ def ActPirate(pirate):
                 
                     
         elif(len(k)==9):
-            time_new=k[8]
-            if (f==0):
-                s=pirate.getSignal()
-                if not(x==int(k[2]) and y==int(k[3])) and s==f"{p},{q}":
+            time_new=int(k[8])
+            s=pirate.getSignal()
+            if ((f==0) and s!=""):
+                if not(x==int(k[2]) and y==int(k[3])) and s==f"{p},{q},0":
                     t=t[0:7]+"0"+t[8:]
                     k[0]=t
                     z=','.join(k)
@@ -452,10 +439,11 @@ def ActPirate(pirate):
                     return moveTo(int(k[2]),int(k[3]),pirate)
                 else:
                     return enemy_kill(int(k[2]),int(k[3]),pirate)
-            elif (f==1):
-                if(time==k[8]): pirate.setSignal(f"{p},{q}")
-                s=pirate.getSignal()
-                if not(x==int(k[6]) and y==int(k[7])) and s==f"{p},{q}":
+            elif ((f==1) and s!=""):
+                if(time==int(k[8]) or time==int(k[8])+1): 
+                    pirate.setSignal(f"{p},{q},0")
+                    return 0
+                if not(x==int(k[6]) and y==int(k[7])) and s==f"{p},{q},0":
                     t=t[0:8]+"0"+t[9]
                     k[0]=t
                     z=','.join(k)
@@ -463,7 +451,7 @@ def ActPirate(pirate):
                     return moveTo(int(k[6]),int(k[7]),pirate)
                 else:
                     return enemy_kill(int(k[6]),int(k[7]),pirate)
-            elif (f==2):
+            elif ((f==2) and s!=""):
                 if (time<=time_new+1):
                     pirate.setSignal(str(a-1-p)+","+str(b-1-q))
                 else:
@@ -475,12 +463,13 @@ def ActPirate(pirate):
                 l=s.split(",")
                 m,n=int(l[0]),int(l[1])
                 return moveAway(m,n,pirate)
+            
             else:
-                o=(int(pirate.getID())-3)/4
+                o=int((int(pirate.getID())-3)/4)
                 if(o%4==0):
-                    if(time<=6.5*a):
+                    if(time<=4.5*a):
                         return moveTo(3*(u//2),(v)//2,pirate)
-                    elif(time==6.5*a+1):
+                    elif(time==4.5*a+1):
                         pirate.setSignal(str(3*(u//2))+","+str(v//2))
                     else:
                         if(x==u or x==a-1 or y==0 or y==v-1):
@@ -490,9 +479,9 @@ def ActPirate(pirate):
                     m,n=int(l[0]),int(l[1])
                     return moveAwayBounded(m,n,u,a-1,0,v-1,pirate)
                 elif(o%4==1):
-                    if(time<=7.5*a):
+                    if(time<=5.5*a):
                         return moveTo(u//2,v//2,pirate)
-                    elif(time==7.5*a+1):
+                    elif(time==5.5*a+1):
                         pirate.setSignal(str(u//2)+","+str(v//2))
                     else:
                         if(x==u-1 or x==0 or y==0 or y==v-1):
@@ -502,9 +491,9 @@ def ActPirate(pirate):
                     m,n=int(l[0]),int(l[1])
                     return moveAwayBounded(m,n,0,u-1,0,v-1,pirate)
                 elif(o%4==2):
-                    if(time<=7.5*a):
+                    if(time<=5.5*a):
                         return moveTo(u//2,3*(v//2),pirate)
-                    elif(time==7.5*a+1):
+                    elif(time==5.5*a+1):
                         pirate.setSignal(str(u//2)+","+str(3*(v//2)))
                     else:
                         if(x==u-1 or x==0 or y==b-1 or y==v):
@@ -514,9 +503,9 @@ def ActPirate(pirate):
                     m,n=int(l[0]),int(l[1])
                     return moveAwayBounded(m,n,0,u-1,v,b-1,pirate)
                 else:
-                    if(time<=7.5*a):
+                    if(time<=5.5*a):
                         return moveTo(3*(u//2),3*(v//2),pirate)
-                    elif(time==7.5*a+1):
+                    elif(time==5.5*a+1):
                         pirate.setSignal(str(3*(u//2))+","+str(3*(v//2)))
                     else:
                         if(x==u or x==a-1 or y==b-1 or y==v):
@@ -529,10 +518,9 @@ def ActPirate(pirate):
                 
         
         elif (len(k)==13):
-            if(f==0):
-                s=pirate.getSignal()
-                print(s)
-                if not(x==int(k[2]) and y==int(k[3])) and s==f"{p},{q}":
+            s=pirate.getSignal()
+            if ((f==0) and s!=""):
+                if not(x==int(k[2]) and y==int(k[3])) and s==f"{p},{q},0":
                     t=t[0:7]+"0"+t[8:]
                     k[0]=t
                     z=','.join(k)
@@ -540,9 +528,8 @@ def ActPirate(pirate):
                     return moveTo(int(k[2]),int(k[3]),pirate)
                 else:
                     return enemy_kill(int(k[2]),int(k[3]),pirate) 
-            elif(f==1):
-                s=pirate.getSignal()
-                if not(x==int(k[6]) and y==int(k[7])) and s==f"{p},{q}":
+            elif((f==1) and s!=""):
+                if not(x==int(k[6]) and y==int(k[7])) and s==f"{p},{q},0":
                     t=t[0:8]+"0"+t[9]
                     k[0]=t
                     z=','.join(k)
@@ -550,10 +537,11 @@ def ActPirate(pirate):
                     return moveTo(int(k[6]),int(k[7]),pirate)
                 else:
                     return enemy_kill(int(k[6]),int(k[7]),pirate)
-            elif (f==2):
-                if(time==k[12]): pirate.setSignal(f"{p},{q}")
-                s=pirate.getSignal()
-                if not(x==int(k[10]) and y==int(k[11])) and s==f"{p},{q}":
+            elif ((f==2) and s!=""):
+                if(time==int(k[12]) or time==int(k[12])+1): 
+                    pirate.setSignal(f"{p},{q},0")
+                    return 0
+                if not(x==int(k[10]) and y==int(k[11])) and s==f"{p},{q},0":
                     t=t[0:9]+"0"
                     k[0]=t
                     z=','.join(k)
@@ -562,11 +550,39 @@ def ActPirate(pirate):
                 else:
                     return enemy_kill(int(k[10]),int(k[11]),pirate) 
             else:
-                o=(int(pirate.getID())-3)/4
+                o=int((int(pirate.getID())-3)/4)
+                if(time>=1000):
+                    if(time==1000): 
+                        pirate.setSignal(f"{p},{q},0")
+                        return 0
+                    if(tr[2+int(k[1])]=="oppCaptured" or tr[2+int(k[1])]=="oppCapturing"):
+                        i1,i2=int(k[2])//u,int(k[3])//v
+                        dict={(0,0):1 , (0,1):2 , (1,0):0 , (1,1):3}
+                        if(o%4==dict[(i1,i2)]) :
+                            if not(x==int(k[2]) and y==int(k[3])):
+                                return moveTo(int(k[2]),int(k[3]),pirate)
+                            else:
+                                enemy_kill(int(k[2]),int(k[3]),pirate) 
+                    if(tr[2+int(k[5])]=="oppCaptured" or tr[2+int(k[5])]=="oppCapturing"):
+                        i1,i2=int(k[6])//u,int(k[7])//v
+                        dict={(0,0):1 , (0,1):2 , (1,0):0 , (1,1):3}
+                        if(o%4==dict[(i1,i2)]) :
+                            if not(x==int(k[6]) and y==int(k[7])):
+                                return moveTo(int(k[6]),int(k[7]),pirate)
+                            else:
+                                enemy_kill(int(k[6]),int(k[7]),pirate) 
+                    if(tr[2+int(k[9])]=="oppCaptured" or tr[2+int(k[9])]=="oppCapturing"):
+                        i1,i2=int(k[10])//u,int(k[11])//v
+                        dict={(0,0):1 , (0,1):2 , (1,0):0 , (1,1):3}
+                        if(o%4==dict[(i1,i2)]) :
+                            if not(x==int(k[10]) and y==int(k[11])):
+                                return moveTo(int(k[10]),int(k[11]),pirate)
+                            else:
+                                enemy_kill(int(k[10]),int(k[11]),pirate)           
                 if(o%4==0):
-                    if(time<=6.5*a):
+                    if(time<=4.5*a):
                         return moveTo(3*(u//2),(v)//2,pirate)
-                    elif(time==6.5*a+1):
+                    elif(time==4.5*a+1):
                         pirate.setSignal(str(3*(u//2))+","+str(v//2))
                     else:
                         if(x==u or x==a-1 or y==0 or y==v-1):
@@ -576,9 +592,9 @@ def ActPirate(pirate):
                     m,n=int(l[0]),int(l[1])
                     return moveAwayBounded(m,n,u,a-1,0,v-1,pirate)
                 elif(o%4==1):
-                    if(time<=7.5*a):
+                    if(time<=5.5*a):
                         return moveTo(u//2,v//2,pirate)
-                    elif(time==7.5*a+1):
+                    elif(time==5.5*a+1):
                         pirate.setSignal(str(u//2)+","+str(v//2))
                     else:
                         if(x==u-1 or x==0 or y==0 or y==v-1):
@@ -588,9 +604,9 @@ def ActPirate(pirate):
                     m,n=int(l[0]),int(l[1])
                     return moveAwayBounded(m,n,0,u-1,0,v-1,pirate)
                 elif(o%4==2):
-                    if(time<=7.5*a):
+                    if(time<=5.5*a):
                         return moveTo(u//2,3*(v//2),pirate)
-                    elif(time==7.5*a+1):
+                    elif(time==5.5*a+1):
                         pirate.setSignal(str(u//2)+","+str(3*(v//2)))
                     else:
                         if(x==u-1 or x==0 or y==b-1 or y==v):
@@ -600,9 +616,9 @@ def ActPirate(pirate):
                     m,n=int(l[0]),int(l[1])
                     return moveAwayBounded(m,n,0,u-1,v,b-1,pirate)
                 else:
-                    if(time<=7.5*a):
+                    if(time<=5.5*a):
                         return moveTo(3*(u//2),3*(v//2),pirate)
-                    elif(time==7.5*a+1):
+                    elif(time==5.5*a+1):
                         pirate.setSignal(str(3*(u//2))+","+str(3*(v//2)))
                     else:
                         if(x==u or x==a-1 or y==b-1 or y==v):
@@ -633,17 +649,17 @@ def ActTeam(team):
         z=','.join(k)
         team.setTeamSignal(z)
     
-    elif((t=="Attack")and(time==6*a)):
+    elif((t=="Attack")and(time==4*a)):
         k[0]="Refresh2"
         z=','.join(k)
         team.setTeamSignal(z)
     
-    elif((t=="Refresh2")and(time>6*a)):
+    elif((t=="Refresh2")and(time>4*a)):
         k[0]="Capture111"
         z=','.join(k)
         team.setTeamSignal(z)
          
-    elif time>6*a:
+    elif time>4*a:
         if(len(k)==5):
             if(int(t[7])==1):
                 team.buildWalls(int(k[1]))
